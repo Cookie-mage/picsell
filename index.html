@@ -1,0 +1,93 @@
+
+<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+
+<head>
+  <title>Picsell</title>
+  <style>
+  #artCanvas {
+  border: 2px solid black;
+  background: white;
+  }
+  </style>
+</head>
+
+<h1>Picsell</h1>
+
+<p>Pixels: <span id="pixels">0</span></p>
+<p>Money: $<span id="money">0</span></p>
+<p>Pixels used: <span id="usedPixels"> 0</span></p>
+
+<canvas id="artCanvas" width="500" height="500"></canvas>
+
+
+
+<button id="sellButton">Sell Art</button>
+
+<script>
+  let pixels = 0;
+  let money = 0;
+  let usedPixels = 0;
+  let pixelsPerSecond = 5;
+  
+  function updateDisplay() {
+    document.getElementById("pixels").textContent = pixels;
+    document.getElementById("money").textContent = money;
+    document.getElementById("usedPixels").textContent = usedPixels
+  }
+
+  setInterval(() => {
+  pixels += pixelsPerSecond;
+  updateDisplay();}, 1000);
+
+const canvas = document.getElementById("artCanvas");
+const ctx = canvas.getContext("2d");
+
+const sellButton = document.getElementById("sellButton");
+
+const cellSize = 75; 
+let currentColor = "red";
+
+function drawPixel(event) {
+  if (pixels <= 0) {
+    return;}
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const gridX = Math.floor(mouseX / cellSize) * cellSize;
+  const gridY = Math.floor(mouseY / cellSize) * cellSize;
+
+  ctx.fillStyle = currentColor;
+  ctx.fillRect(gridX, gridY, cellSize, cellSize);
+
+  pixels -= 1;
+  usedPixels += 1;
+
+  updateDisplay();
+}
+
+canvas.addEventListener("click", drawPixel);
+
+sellButton.addEventListener("click", function () {
+  money += usedPixels;
+  usedPixels = 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  updateDisplay();
+});
+
+let isDrawing = false;
+
+canvas.addEventListener("mousedown", function () {
+  isDrawing = true;
+});
+canvas.addEventListener("mouseup", function () {
+  isDrawing = false;
+});
+  
+canvas.addEventListener("mousemove", function (event) {
+  if (isDrawing) {
+    drawPixel(event);
+  }
+});
+
+</script>
+
